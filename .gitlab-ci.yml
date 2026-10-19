@@ -1,0 +1,46 @@
+# Builds each image in <name>/ and pushes it to this project's registry as
+# $CI_REGISTRY_IMAGE/<name>:<short commit SHA> and :latest.
+# Buildah runs without a Docker daemon, so no privileged runner is needed.
+
+stages:
+  - build
+
+.build:
+  stage: build
+  image: quay.io/buildah/stable:v1.38.0
+  variables:
+    STORAGE_DRIVER: vfs
+    BUILDAH_ISOLATION: chroot
+    IMAGE: $CI_REGISTRY_IMAGE/$NAME
+  script:
+    - buildah login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" "$CI_REGISTRY"
+    - buildah bud -t "$IMAGE:$CI_COMMIT_SHORT_SHA" -t "$IMAGE:latest" "$NAME/"
+    - buildah push "$IMAGE:$CI_COMMIT_SHORT_SHA"
+    - buildah push "$IMAGE:latest"
+    - echo "Docker Image for Artemis:" "$IMAGE:$CI_COMMIT_SHORT_SHA"
+
+build-bonus:
+  extends: .build
+  variables:
+    NAME: bonus
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "web"
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      changes:
+        - bonus/**/*
+        - .gitlab-ci.yml
+    - when: manual
+      allow_failure: true
+
+build-competition:
+  extends: .build
+  variables:
+    NAME: competition
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "web"
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      changes:
+        - competition/**/*
+        - .gitlab-ci.yml
+    - when: manual
+      allow_failure: true
