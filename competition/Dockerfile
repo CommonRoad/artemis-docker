@@ -6,7 +6,7 @@
 # dependencies into a separate venv_student at build time. See README.md for
 # how this image is built, published and selected in Artemis.
 
-FROM python:3.10-bullseye
+FROM python:3.10-bookworm
 
 # - curl, git: not used by the build script or the tests; can be dropped
 # - build-essential, cmake, libspatialindex-dev: needed to build
