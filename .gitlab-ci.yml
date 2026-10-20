@@ -1,22 +1,25 @@
 # Builds each image in <name>/ and pushes it to this project's registry as
 # $CI_REGISTRY_IMAGE/<name>:<short commit SHA> and :latest.
-# Buildah runs without a Docker daemon, so no privileged runner is needed.
+# Kaniko builds without a Docker daemon, so no privileged runner is needed.
 
 stages:
   - build
 
 .build:
   stage: build
-  image: quay.io/buildah/stable:v1.38.0
+  image:
+    name: gcr.io/kaniko-project/executor:v1.23.2-debug
+    entrypoint: [""]
   variables:
-    STORAGE_DRIVER: vfs
-    BUILDAH_ISOLATION: chroot
     IMAGE: $CI_REGISTRY_IMAGE/$NAME
   script:
-    - buildah login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" "$CI_REGISTRY"
-    - buildah bud -t "$IMAGE:$CI_COMMIT_SHORT_SHA" -t "$IMAGE:latest" "$NAME/"
-    - buildah push "$IMAGE:$CI_COMMIT_SHORT_SHA"
-    - buildah push "$IMAGE:latest"
+    - AUTH=$(printf '%s:%s' "$CI_REGISTRY_USER" "$CI_REGISTRY_PASSWORD" | base64 | tr -d '\n')
+    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"auth\":\"$AUTH\"}}}" > /kaniko/.docker/config.json
+    - /kaniko/executor
+      --context "$CI_PROJECT_DIR/$NAME"
+      --dockerfile "$CI_PROJECT_DIR/$NAME/Dockerfile"
+      --destination "$IMAGE:$CI_COMMIT_SHORT_SHA"
+      --destination "$IMAGE:latest"
     - echo "Docker Image for Artemis:" "$IMAGE:$CI_COMMIT_SHORT_SHA"
 
 build-bonus:
