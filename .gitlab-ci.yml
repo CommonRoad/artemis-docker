@@ -1,5 +1,7 @@
-# Builds each image in <name>/ and pushes it to this project's registry as
-# $CI_REGISTRY_IMAGE/<name>:<short commit SHA> and :latest.
+# Builds each image in <name>/ and pushes it as <short commit SHA> and :latest
+# to this project's registry and, when GHCR_USER and GHCR_TOKEN are set, to
+# ghcr.io/commonroad/artemis-<name>. Artemis pulls from ghcr.io, because its
+# build agents cannot pull from this registry's port 5005.
 # Kaniko builds without a Docker daemon, so no privileged runner is needed.
 
 stages:
@@ -12,15 +14,25 @@ stages:
     entrypoint: [""]
   variables:
     IMAGE: $CI_REGISTRY_IMAGE/$NAME
+    GHCR_IMAGE: ghcr.io/commonroad/artemis-$NAME
   script:
-    - AUTH=$(printf '%s:%s' "$CI_REGISTRY_USER" "$CI_REGISTRY_PASSWORD" | base64 | tr -d '\n')
-    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"auth\":\"$AUTH\"}}}" > /kaniko/.docker/config.json
-    - /kaniko/executor
-      --context "$CI_PROJECT_DIR/$NAME"
-      --dockerfile "$CI_PROJECT_DIR/$NAME/Dockerfile"
-      --destination "$IMAGE:$CI_COMMIT_SHORT_SHA"
-      --destination "$IMAGE:latest"
-    - echo "Docker Image for Artemis:" "$IMAGE:$CI_COMMIT_SHORT_SHA"
+    - GITLAB_AUTH=$(printf '%s:%s' "$CI_REGISTRY_USER" "$CI_REGISTRY_PASSWORD" | base64 | tr -d '\n')
+    - AUTHS="\"$CI_REGISTRY\":{\"auth\":\"$GITLAB_AUTH\"}"
+    - DESTINATIONS="--destination $IMAGE:$CI_COMMIT_SHORT_SHA --destination $IMAGE:latest"
+    - |
+      if [ -n "$GHCR_USER" ] && [ -n "$GHCR_TOKEN" ]; then
+        GHCR_AUTH=$(printf '%s:%s' "$GHCR_USER" "$GHCR_TOKEN" | base64 | tr -d '\n')
+        AUTHS="$AUTHS,\"ghcr.io\":{\"auth\":\"$GHCR_AUTH\"}"
+        DESTINATIONS="$DESTINATIONS --destination $GHCR_IMAGE:$CI_COMMIT_SHORT_SHA --destination $GHCR_IMAGE:latest"
+      fi
+    - echo "{\"auths\":{$AUTHS}}" > /kaniko/.docker/config.json
+    - /kaniko/executor --context "$CI_PROJECT_DIR/$NAME" --dockerfile "$CI_PROJECT_DIR/$NAME/Dockerfile" $DESTINATIONS
+    - |
+      if [ -n "$GHCR_TOKEN" ]; then
+        echo "Docker Image for Artemis: $GHCR_IMAGE:$CI_COMMIT_SHORT_SHA"
+      else
+        echo "GHCR_USER/GHCR_TOKEN not set; pushed only to $IMAGE:$CI_COMMIT_SHORT_SHA"
+      fi
 
 build-bonus:
   extends: .build
