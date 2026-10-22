@@ -4,8 +4,8 @@ Docker images in which Artemis grades the CommonRoad programming exercises. Each
 
 | Image | Exercise | What it contains |
 |---|---|---|
-| `ghcr.io/commonroad/artemis-bonus` | Bonus Challenge | pytest, `commonroad-io`, `commonroad-drivability-checker`, `commonroad-vehicle-models`, `triangle`, `commonroad-clcs`. The build script installs nothing. |
-| `ghcr.io/commonroad/artemis-competition` | Motion Planning Competition | The grading dependencies in `competition/requirements.txt`. The build script installs the student's own dependencies into a separate venv at build time. |
+| `ghcr.io/commonroad/artemis-docker/bonus` | Bonus Challenge | pytest, `commonroad-io`, `commonroad-drivability-checker`, `commonroad-vehicle-models`, `triangle`, `commonroad-clcs`. The build script installs nothing. |
+| `ghcr.io/commonroad/artemis-docker/competition` | Motion Planning Competition | The grading dependencies in `competition/requirements.txt`. The build script installs the student's own dependencies into a separate venv at build time. |
 
 CI pushes each image to this project's registry and to the public GitHub Container Registry of the CommonRoad organization. Artemis pulls from ghcr.io without logging in; its build agents cannot pull from this registry, which listens on port 5005.
 

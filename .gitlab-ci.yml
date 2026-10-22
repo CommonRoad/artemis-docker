@@ -1,6 +1,6 @@
 # Builds each image in <name>/ and pushes it as <short commit SHA> and :latest
 # to this project's registry and, when GHCR_USER and GHCR_TOKEN are set, to
-# ghcr.io/commonroad/artemis-<name>. Artemis pulls from ghcr.io, because its
+# ghcr.io/commonroad/artemis-docker/<name>. Artemis pulls from ghcr.io, because its
 # build agents cannot pull from this registry's port 5005.
 # Kaniko builds without a Docker daemon, so no privileged runner is needed.
 
@@ -14,7 +14,7 @@ stages:
     entrypoint: [""]
   variables:
     IMAGE: $CI_REGISTRY_IMAGE/$NAME
-    GHCR_IMAGE: ghcr.io/commonroad/artemis-$NAME
+    GHCR_IMAGE: ghcr.io/commonroad/artemis-docker/$NAME
   script:
     - GITLAB_AUTH=$(printf '%s:%s' "$CI_REGISTRY_USER" "$CI_REGISTRY_PASSWORD" | base64 | tr -d '\n')
     - AUTHS="\"$CI_REGISTRY\":{\"auth\":\"$GITLAB_AUTH\"}"
@@ -26,7 +26,7 @@ stages:
         DESTINATIONS="$DESTINATIONS --destination $GHCR_IMAGE:$CI_COMMIT_SHORT_SHA --destination $GHCR_IMAGE:latest"
       fi
     - echo "{\"auths\":{$AUTHS}}" > /kaniko/.docker/config.json
-    - /kaniko/executor --context "$CI_PROJECT_DIR/$NAME" --dockerfile "$CI_PROJECT_DIR/$NAME/Dockerfile" $DESTINATIONS
+    - /kaniko/executor --context "$CI_PROJECT_DIR/$NAME" --dockerfile "$CI_PROJECT_DIR/$NAME/Dockerfile" --label org.opencontainers.image.source=https://github.com/CommonRoad/artemis-docker $DESTINATIONS
     - |
       if [ -n "$GHCR_TOKEN" ]; then
         echo "Docker Image for Artemis: $GHCR_IMAGE:$CI_COMMIT_SHORT_SHA"
