@@ -2,7 +2,10 @@
 # to this project's registry and, when GHCR_USER and GHCR_TOKEN are set, to
 # ghcr.io/commonroad/artemis-docker/<name>. Artemis pulls from ghcr.io, because its
 # build agents cannot pull from this registry's port 5005.
-# Kaniko builds without a Docker daemon, so no privileged runner is needed.
+# Kaniko builds without a Docker daemon or user namespaces, so it runs on the
+# unprivileged tum-cps runner (BuildKit rootless and Buildah need user
+# namespaces, which the runner blocks). Google's kaniko is archived, so this
+# uses the maintained fork https://github.com/osscontainertools/kaniko.
 
 stages:
   - build
@@ -10,7 +13,7 @@ stages:
 .build:
   stage: build
   image:
-    name: gcr.io/kaniko-project/executor:v1.23.2-debug
+    name: ghcr.io/osscontainertools/kaniko:v1.29.0-debug
     entrypoint: [""]
   variables:
     IMAGE: $CI_REGISTRY_IMAGE/$NAME
