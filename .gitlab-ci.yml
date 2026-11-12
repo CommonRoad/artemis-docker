@@ -62,3 +62,17 @@ build-competition:
         - .gitlab-ci.yml
     - when: manual
       allow_failure: true
+
+# The bonus image plus the ground-truth scenarios (see search/Dockerfile). It
+# does not rebuild on a change to this file: its base is a pinned bonus image.
+build-search:
+  extends: .build
+  variables:
+    NAME: search
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "web"
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      changes:
+        - search/**/*
+    - when: manual
+      allow_failure: true
