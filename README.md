@@ -33,6 +33,17 @@ To change the data (a new edition, or a corrected scenario):
 2. Set `DATA_VERSION` and `DATA_SHA256` in `search/Dockerfile` to the printed values and push to `main`. Use the new image in Artemis as described above.
 3. In the exercise's Template and Solution repositories, set `DATA_VERSION`, `ARCHIVE_SIZE`, `ARCHIVE_SHA256` and `_ARCHIVE_COMMIT` (the commit of step 1) in `SMP/exercise_data.py`. Checkouts with the old data fetch the new archive on their next import of `SMP`.
 
+## Course data of the competition (Urban Challenge)
+
+The competition's Artemis Template repository is a slim copy of the branch `develop/ws_26` of [commonroad-docker-submission](https://gitlab.lrz.de/tum-cps/commonroad-docker-submission) without three parts that students never change: the 100 public scenarios in `planner/assets/scenarios/public/` (about 61 MB of XML), the SMP wheel `vendor/commonroad_search-2025.1-py3-none-any.whl` and the framework's `tests/`. This repository keeps them as one archive: `competition-data/commonroad-competition-data-<version>.tar.xz` (about 7 MB). No image is built from `competition-data/`.
+
+- `planner/competition_data.py` in the Template repository downloads the archive from this repository into a student's checkout: by hand with `python -m planner.fetch_data` (needed before `poetry install`, which installs the wheel), during the Docker build, and the first time `planner` is imported. It pins the commit of the archive and its SHA-256. The tests are only unpacked with `--tests`.
+
+To change the data (new public scenarios, a new SMP wheel or new tests):
+
+1. Run `python competition-data/make_bundle.py <complete checkout of commonroad-docker-submission> <new version>` and commit the new archive. Keep the old archive: checkouts of earlier Template versions still download it.
+2. In the Template and Solution repositories, set `DATA_VERSION`, `ARCHIVE_SIZE`, `ARCHIVE_SHA256` and `_ARCHIVE_COMMIT` (the commit of step 1) in `planner/competition_data.py`, and the file counts in `GROUPS` if they changed.
+
 ## ghcr.io access
 
 The push to ghcr.io uses the CI/CD variables `GHCR_USER` and `GHCR_TOKEN` (masked): a GitHub account in the CommonRoad organization and a token of it with the `write:packages` scope. Without them, CI pushes to this project's registry only. Every package must be public on GitHub (package settings → Change visibility); a new image name, such as `search`, starts out private.
