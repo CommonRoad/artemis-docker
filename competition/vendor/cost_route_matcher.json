@@ -1,0 +1,13 @@
+{
+  "distribution": "commonroad-drivability-checker",
+  "version": "2025.3.1",
+  "source": "commonroad_dc/costs/route_matcher.py",
+  "upstream_sha256": "ad6e44567316c14b3b542e641acfa0dc8ddf46b153698e8345f6a49c732fcf30",
+  "vendored_sha256": "49295eb9a7b443dd6d27ab8d1c5fb78f059c3607ea562c6d2108471fd522da54",
+  "changed_exception_handlers": 4,
+  "changes": [
+    "Catch CLCS 2025.2 projection exceptions alongside ValueError",
+    "Import upstream SolutionProperties to preserve enum identity"
+  ],
+  "license": "BSD-3-Clause"
+}

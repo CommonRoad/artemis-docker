@@ -1,0 +1,19 @@
+{
+  "file": "commonroad_search-2025.1-py3-none-any.whl",
+  "sha256": "321e9012b910c2042032b1ab16b1f92254ba1270e2fa34ad441f774eae8d30bf",
+  "source_revision": "b2a0177f2f8cab30ed2e2bcaefdb663e39c94420",
+  "note": "Original reconciled wheel with the search-memory cleanup backported from the maintained search repository. Only the seven listed source files and wheel RECORD changed; dependency metadata, motion primitives and all other payloads are unchanged.",
+  "memory_cleanup": {
+    "source_revision": "87ea13cf5327364a7a2e252a6e48eaeac0faf0fb",
+    "base_wheel_sha256": "fa25518f00c74a05f808c3003fb174b58061f5895e261d45cbfc583afae5a2e6",
+    "files": {
+      "SMP/batch_processing/process_scenario.py": "833efe176e2f260e8d93e8a4dc9db67fb1e30b26076f9b4e27b85a9f18d0c573",
+      "SMP/motion_planner/plot_config.py": "31bbc538e676a18a6a3041e23c68f28b6b59312a901537615cb57c9dbe6f5ab6",
+      "SMP/motion_planner/search_algorithms/base_class.py": "695798073b99c82f4fbdc75a3f1ee3def7029d9d0c1531c79c01a7988410e251",
+      "SMP/motion_planner/search_algorithms/best_first_search.py": "2e375a052177a8e1c6fce5e1b34fe85aaacf1b666c2df8337377871b36da9f97",
+      "SMP/motion_planner/search_algorithms/depth_limited_search.py": "bf1405d04d6776cf106d744574a3d307626c244363b3dfbc155769e81a8efb73",
+      "SMP/motion_planner/search_algorithms/sequential_search.py": "aeb39e0e3d858f3d425d81cc7ffbf231ffc53d85f6035777accc3ca7ec654499",
+      "SMP/motion_planner/utility.py": "5dee88e2f00e4e2e319229510b5951813775961f461320dc1a1f5eb116a716ee"
+    }
+  }
+}

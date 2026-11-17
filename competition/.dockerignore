@@ -1,0 +1,53 @@
+# Repository and editor metadata
+.git
+.gitignore
+.gitattributes
+.idea/
+.vscode/
+**/.ropeproject/
+**/*.swp
+**/*.swo
+.DS_Store
+
+# Python environments, caches and build output
+.venv/
+venv/
+env/
+**/__pycache__/
+**/*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.tox/
+.nox/
+build/
+dist/
+*.egg-info/
+.coverage*
+htmlcov/
+coverage.xml
+
+# Generated results and notebooks
+solutions/
+outputs/
+tutorials/outputs/
+submission.zip
+**/.ipynb_checkpoints/
+*.log
+
+# Local datasets and organizer work
+scenarios/
+scenarios_phase_*/
+scenarios*.zip
+solution_visualization/
+debug/
+organizer/
+internal/
+requirements*.txt
+
+# Download bookkeeping of planner/competition_data.py
+.commonroad-competition-data*
+
+# Local credentials
+.env
+.env.*

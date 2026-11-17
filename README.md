@@ -5,14 +5,14 @@ Docker images in which Artemis grades the CommonRoad programming exercises. Each
 | Image | Exercise | What it contains |
 |---|---|---|
 | `ghcr.io/commonroad/artemis-docker/bonus` | Bonus Challenge | pytest, `commonroad-io`, `commonroad-drivability-checker`, `commonroad-vehicle-models`, `triangle`, `commonroad-clcs`. The build script installs nothing. |
-| `ghcr.io/commonroad/artemis-docker/competition` | Motion Planning Competition | The grading dependencies in `competition/requirements.txt`. The build script installs the student's own dependencies into a separate venv at build time. |
+| `ghcr.io/commonroad/artemis-docker/competition` | Motion Planning Competition | The `evaluator` stage of the Template's Dockerfile: the framework (`planner`, `simulation`), SUMO, pytest and the 100 public scenarios. The build script installs only the student's own dependencies into a separate venv. |
 | `ghcr.io/commonroad/artemis-docker/search` | CommonRoad Search (the Bonus Challenge without scenarios in its repositories) | The `bonus` image plus the 500 ground-truth scenarios in `/opt/commonroad-search-data/scenarios/exercise`. The build script installs nothing. |
 
 CI pushes each image to this project's registry and to the public GitHub Container Registry of the CommonRoad organization. Artemis pulls from ghcr.io without logging in; its build agents cannot pull from this registry, which listens on port 5005.
 
 ## Updating an image
 
-1. Change `<name>/Dockerfile` (or `competition/requirements.txt`) and push to `main`.
+1. Change `<name>/Dockerfile` and push to `main`. For `competition`, see "Grading image of the competition" below.
 2. CI builds the image and pushes it with the tags `<short commit SHA>` and `latest`. The last line of the job log is the full ghcr.io image reference.
 3. In Artemis, open the exercise's build configuration and set **Docker Image** to that reference.
 
@@ -32,6 +32,12 @@ To change the data (a new edition, or a corrected scenario):
 1. Run `python search/data/make_bundle.py <complete checkout of the exercise> <new version>` and commit the new archive. Keep the old archive: checkouts of earlier Template versions still download it.
 2. Set `DATA_VERSION` and `DATA_SHA256` in `search/Dockerfile` to the printed values and push to `main`. Use the new image in Artemis as described above.
 3. In the exercise's Template and Solution repositories, set `DATA_VERSION`, `ARCHIVE_SIZE`, `ARCHIVE_SHA256` and `_ARCHIVE_COMMIT` (the commit of step 1) in `SMP/exercise_data.py`. Checkouts with the old data fetch the new archive on their next import of `SMP`.
+
+## Grading image of the competition (Urban Challenge)
+
+`competition/` is a snapshot of the competition's Artemis Template repository (the tracked files, without `.gitignore`), and CI builds the `evaluator` stage of its `Dockerfile`. The grading code is thus exactly the framework the students get. The Dockerfile downloads the course data (below) while it builds, so the snapshot has no scenarios.
+
+After a change in the Template, replace `competition/` with the tracked files of the new Template commit (`git archive <commit> | tar -x -C competition`, then delete `competition/.gitignore`), push to `main`, and set the new tag in the exercise's Docker Image.
 
 ## Course data of the competition (Urban Challenge)
 

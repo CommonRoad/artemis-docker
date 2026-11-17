@@ -1,0 +1,33 @@
+{
+    "name": "CommonRoad Motion Planning (Python 3.11)",
+    "build": {
+        "dockerfile": "../Dockerfile",
+        "context": "..",
+        "target": "development",
+        "options": [
+            "--platform=linux/amd64"
+        ]
+    },
+    "workspaceMount": "source=${localWorkspaceFolder},target=/commonroad/commonroad-docker-submission,type=bind",
+    "workspaceFolder": "/commonroad/commonroad-docker-submission",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-python.python",
+                "ms-toolsai.jupyter"
+            ],
+            "settings": {
+                "python.defaultInterpreterPath": "/usr/local/bin/python"
+            }
+        }
+    },
+    "runArgs": [
+        "--platform=linux/amd64",
+        "--cpus=1",
+        "--memory=4g",
+        "--memory-swap=4g"
+    ],
+    "forwardPorts": [
+        8888
+    ]
+}

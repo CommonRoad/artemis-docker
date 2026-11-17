@@ -29,7 +29,7 @@ stages:
         DESTINATIONS="$DESTINATIONS --destination $GHCR_IMAGE:$CI_COMMIT_SHORT_SHA --destination $GHCR_IMAGE:latest"
       fi
     - echo "{\"auths\":{$AUTHS}}" > /kaniko/.docker/config.json
-    - /kaniko/executor --context "$CI_PROJECT_DIR/$NAME" --dockerfile "$CI_PROJECT_DIR/$NAME/Dockerfile" --label org.opencontainers.image.source=https://github.com/CommonRoad/artemis-docker $DESTINATIONS
+    - /kaniko/executor --context "$CI_PROJECT_DIR/$NAME" --dockerfile "$CI_PROJECT_DIR/$NAME/Dockerfile" ${TARGET:+--target $TARGET} --label org.opencontainers.image.source=https://github.com/CommonRoad/artemis-docker $DESTINATIONS
     - |
       if [ -n "$GHCR_TOKEN" ]; then
         echo "Docker Image for Artemis: $GHCR_IMAGE:$CI_COMMIT_SHORT_SHA"
@@ -50,10 +50,12 @@ build-bonus:
     - when: manual
       allow_failure: true
 
+# The evaluator stage of the exercise Template's Dockerfile (see README.md).
 build-competition:
   extends: .build
   variables:
     NAME: competition
+    TARGET: evaluator
   rules:
     - if: $CI_PIPELINE_SOURCE == "web"
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH

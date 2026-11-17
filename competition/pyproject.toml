@@ -1,0 +1,76 @@
+[project]
+name = "commonroad-docker-submission"
+version = "0.1.0"
+description = "Interactive CommonRoad motion planning competition workspace"
+authors = [
+    {name = "Youran Wang", email = "youran.wang@tum.de"},
+    {name = "Haoliang Huang", email = "haoliang.huang@tum.de"},
+]
+license = "MIT"
+readme = "README.md"
+requires-python = ">=3.11,<3.12"
+dependencies = [
+    "commonroad-search==2025.1",
+    "commonroad-io==2024.3",
+    "commonroad-drivability-checker==2025.3.1",
+    "commonroad-route-planner==2025.1.0",
+    "commonroad-clcs==2025.2.0",
+    "commonroad-vehicle-models==3.0.2",
+    "numpy==2.2.6",
+    "scipy==1.15.3",
+    "matplotlib==3.10.7",
+    "shapely==2.1.2",
+    "triangle==20250106",
+    "networkx==3.4.2",
+    "imageio==2.37.0",
+    "commonroad-sumo==2025.1.4",
+    "eclipse-sumo==1.24.0",
+    "libsumo==1.24.0",
+    "traci==1.24.0",
+    "sumolib==1.24.0",
+    "methodtools==0.4.7",
+    "omegaconf==2.3.0",
+]
+
+[tool.poetry]
+packages = [
+    {include = "simulation"},
+    {include = "planner"},
+    {include = "my_submission"},
+    {include = "commonroad_rp"},
+    {include = "tools"},
+]
+include = [
+    {path = "commonroad_rp/LICENSE", format = ["sdist", "wheel"]},
+    {path = "vendor/reactive_planner.json", format = ["sdist", "wheel"]},
+    {path = "vendor/cost_route_matcher.json", format = ["sdist", "wheel"]},
+    {path = "planner/common/vendor/LICENSE.commonroad_dc", format = ["sdist", "wheel"]},
+    {path = "planner/assets/**/*", format = ["sdist", "wheel"]},
+]
+
+[tool.poetry.dependencies]
+commonroad-search = {path = "vendor/commonroad_search-2025.1-py3-none-any.whl"}
+
+[tool.poetry.group.dev]
+optional = true
+
+[tool.poetry.group.dev.dependencies]
+jupyterlab = ">=4.4,<5"
+ipykernel = "6.29.5"
+ipython = "8.10.0"
+ipywidgets = ">=8.1.5,<9"
+
+[tool.poetry.group.test]
+optional = true
+
+[tool.poetry.group.test.dependencies]
+pytest = "8.4.2"
+
+[build-system]
+requires = ["poetry-core==2.2.1"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 100
+target-version = ["py311"]
+force-exclude = '/(commonroad_rp|SMP|vendor)/'

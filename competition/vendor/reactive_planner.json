@@ -1,0 +1,41 @@
+{
+  "source": "https://gitlab.lrz.de/tum-cps/commonroad-reactive-planner",
+  "commit": "6001c2cad337ba3741d51061152c3755d178b020",
+  "version": "2025.1",
+  "note": "commonroad_rp copied from the recorded upstream revision with the local correction below. File hashes describe the current vendored files; the original changed-file hash is retained in local_changes. The competition adapter lives in planner/algorithms/reactive.py.",
+  "files": {
+    "LICENSE": "b1eaf59cc74d6034ebc3395404c0332f87e35f04fae5375c4a51b2763d7abd7a",
+    "__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "cost_function.py": "e06721cde2f69e1a2c8ce2829a93ceccbc800c94c36a910bc0b624aa0850a23b",
+    "polynomial_trajectory.py": "6936df102bb0a3d0020515a1134265cff422785295c65f990f442621303320a1",
+    "reactive_planner.py": "98e3be3d8b1b2a4844cc9fc1fbe67b5e18734746987caa672f4bf5938d599b7d",
+    "reactive_planner_easy_api.py": "024be4fe8341dd5f9b7e9f5601d4f3b11a00e80fbad3352b9d5d108a5c6c10aa",
+    "sampling/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "sampling/base/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "sampling/base/base_sampling_domain.py": "ad8d70b2ea57c286c12fe9c54fb799c185ed42b568421e54164d7080e897e8ea",
+    "sampling/base/base_sampling_space.py": "6205a6f4a6b2d79f1b2842c57605649a0de86653a7172ffa26c55aeb9a0cd494",
+    "sampling/factory.py": "46804073ffe8b108385194c4f2a745fabb97883c9a0593fbcf81a72e6bbcee3e",
+    "sampling/implementation/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "sampling/implementation/sampling_domain.py": "2d37469e0a3e202f7befd6ceb948feee568a1ddef83ba82511d81fba5e4d773d",
+    "sampling/implementation/sampling_space_corridor.py": "6404e051a412df09d1ba85015471b65186a9ea61ed0ac3754d02bbce21a980d2",
+    "sampling/implementation/sampling_space_fixed.py": "6c2656acaf69ff4ccaabb75dce3e6147df0bb253941d9ba3f44432798a45acfe",
+    "state.py": "f40e2d31f86c4aeb8cd654d7488e18e60584377019972cfcc3312b73e0359073",
+    "trajectories.py": "bf5eba0b789e123290747def6a845136b6edc9d22f016762c771059225820e89",
+    "utility/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "utility/config.py": "81a5fbe609cbc8e12a42ea57a5798efb2473e1e1b66790ee17e6cef52ea5fb42",
+    "utility/evaluation.py": "82834e84b580b770dd6bf54686aafeff18e07dd9948c28f8dc6d97ed444af044",
+    "utility/general.py": "2827a7d4125509fde6ab6f1eddd83a7dc4caa1d1166b8e015749e7e7f5152b73",
+    "utility/logger.py": "04980da213c5a807fafa8711200c00eecb8919ca65843b5a6104a0e92065fdd9",
+    "utility/utils_coordinate_system.py": "0f1df65aa5208422d6a36a1a127c2577f7188dee46a09e96c286b71bd5318fba",
+    "utility/visualization.py": "bd081998779ca8c3734f382eeb4856492f3ea55eb52a7e05cc2b7f36daf89fbb"
+  },
+  "local_changes": [
+    {
+      "date": "2026-11-05",
+      "file": "reactive_planner.py",
+      "upstream_sha256": "18600bf2f351601cb42b5fbfc4a6044044c3d4019534ad85c75650f0bc950b03",
+      "reason": "Invert the existing d\u2032 = (1 - reference_curvature * lateral_offset) * tan(relative_heading) relation consistently in both forward heading branches. Correct heading, speed, acceleration and curvature reconstruction without changing validation tolerances.",
+      "regression_tests": "tests/test_reactive_conversion.py"
+    }
+  ]
+}
