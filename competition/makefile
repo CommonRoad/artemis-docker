@@ -19,8 +19,8 @@ run:
 		--mount "type=bind,source=$(CURDIR)/solutions,target=/commonroad/solutions" \
 		"$(IMAGE):$(TAG)" $(ARGS) --submission /assignment --solutions /commonroad/solutions
 
-# The tests are not part of the repository: run "python -m planner.fetch_data --tests"
-# before make build-dev.
+# Slim checkouts omit tests: run "python -m planner.fetch_data --tests"
+# before make build-dev when they are missing.
 test:
 	docker run --rm --platform "$(PLATFORM)" --cpus=1 --memory=4g --memory-swap=4g \
 		--network none --entrypoint python "$(IMAGE):$(TAG)-dev" -m pytest tests -q

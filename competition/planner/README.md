@@ -27,9 +27,9 @@ planner/
 │   ├── artifacts.py       # Save the ego/traffic pair and execution metadata
 │   ├── batch.py           # Sequential and process-based batches with per-task exports
 │   └── evaluation.py      # Result summaries and per-scenario feedback
-├── competition_data.py    # Download of the course data kept out of Git
+├── competition_data.py    # Fetch course data omitted from slim checkouts
 ├── fetch_data.py          # python -m planner.fetch_data
-└── assets/                # Scenario XMLs (fetched) and motion primitives
+└── assets/                # Scenario XMLs (bundled or fetched) and motion primitives
 ```
 
 For a participant, the main entry points are:

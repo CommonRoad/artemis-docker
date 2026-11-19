@@ -1,9 +1,8 @@
-"""Course data files that are not part of the Git repository.
+"""Course data assets that may be omitted from slim checkouts.
 
-These files are large and never change during the competition, so they are
-kept out of the repository. They are downloaded once and unpacked into the
-places where the framework, the tutorials, the Dockerfile and Poetry expect
-them:
+The full repository includes these assets; the slim Artemis template omits them.
+Missing assets are downloaded once and unpacked into the places where the
+framework, tutorials, Dockerfile and Poetry expect them:
 
     planner/assets/scenarios/public/            100 public scenarios
     vendor/commonroad_search-2025.1-...whl        the bundled SMP planner wheel
@@ -16,8 +15,8 @@ cloning, in the root folder of the checkout:
 
 This module uses only the Python standard library, so it works before
 anything is installed. Afterwards, importing planner fetches missing
-scenarios by itself. Git ignores the downloaded files, so they never end up
-in a commit.
+scenarios by itself. Git ignores downloaded assets in slim checkouts; the full
+repository retains its already tracked copies.
 """
 
 import fnmatch
@@ -35,11 +34,11 @@ from pathlib import Path
 # The archive is built by competition-data/make_bundle.py in the artemis-docker
 # repository from the branch develop/ws_26 of commonroad-docker-submission. Its
 # SHA-256 is checked before anything is unpacked.
-DATA_VERSION = "2026.1"
+DATA_VERSION = "2026.2"
 ARCHIVE_NAME = f"commonroad-competition-data-{DATA_VERSION}.tar.xz"
-ARCHIVE_SIZE = 6952100
-ARCHIVE_SHA256 = "bfde6defde07b1310b1fad752d46c0361823e3dbec25a16e0e9a3295a8e5ea4f"
-_ARCHIVE_COMMIT = "89036019007b2a95ca09bb5cb305ef593648d343"
+ARCHIVE_SIZE = 7966244
+ARCHIVE_SHA256 = "8639e0979b17ebc0002bd1b58c0b7675b20c2f8d9b1816e28abdb13ee0ad7f5c"
+_ARCHIVE_COMMIT = "79d88b44e3f1daee44b97533c80fd1ed53f2ad62"
 ARCHIVE_URLS = (
     f"https://gitlab.lrz.de/tum-cps/artemis-docker/-/raw/{_ARCHIVE_COMMIT}/competition-data/{ARCHIVE_NAME}",
     f"https://raw.githubusercontent.com/CommonRoad/artemis-docker/{_ARCHIVE_COMMIT}/competition-data/{ARCHIVE_NAME}",
@@ -68,7 +67,7 @@ _DOWNLOAD_TIMEOUT_SECONDS = 30
 _HELP = """
 CommonRoad competition: the course data could not be fetched:
     {error}
-The public scenarios and the SMP wheel are not part of the repository. To get them, either
+The public scenarios or SMP wheel are missing from this checkout. To get them, either
   - check your internet connection and run, in the root folder of your checkout:
         python -m planner.fetch_data
   - or download this file in a browser:
@@ -261,7 +260,7 @@ def fetch(groups=DEFAULT_GROUPS, archive=None, force=False):
         staging = Path(tempfile.mkdtemp(prefix=_STAGING_PREFIX, dir=ROOT))
         if archive is None:
             _say(
-                "the public scenarios and the SMP wheel are not part of the Git repository. "
+                "the public scenarios or SMP wheel are missing from this checkout. "
                 f"Downloading them once ({ARCHIVE_SIZE / 1e6:.0f} MB) ..."
             )
             archive = staging / ARCHIVE_NAME

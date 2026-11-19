@@ -4,8 +4,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential ffmpeg libgl1 libgomp1 libxerces-c3.2 libfox-1.6-0 \
     && rm -rf /var/lib/apt/lists/*
 WORKDIR /commonroad/commonroad-docker-submission
-# The public scenarios and the SMP wheel are not part of the Git repository.
-# Use the ones already fetched into the checkout, or download them now
+# Slim checkouts omit the public scenarios and SMP wheel.
+# Use assets already present in either checkout, or download missing ones now
 # (python -m planner.fetch_data; it needs only the standard library).
 COPY planner/__init__.py planner/competition_data.py planner/fetch_data.py planner/
 COPY planner/assets/ planner/assets/

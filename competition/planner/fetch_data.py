@@ -1,4 +1,4 @@
-"""Fetches the course data that is not part of the Git repository.
+"""Fetches course data omitted from slim checkouts; reuses complete local assets.
 
     python -m planner.fetch_data                      the public scenarios and the SMP wheel
     python -m planner.fetch_data --tests              also the framework's tests

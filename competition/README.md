@@ -9,11 +9,15 @@ traffic from the same run, and the exact source and configuration that produced 
 
 ## Course data
 
-The 100 public scenarios (`planner/assets/scenarios/public/`), the bundled SMP planner
-wheel (`vendor/commonroad_search-2025.1-py3-none-any.whl`) and the framework's tests
-(`tests/`) never change, so they are not part of this repository. Fetch them once
-(about 7 MB) from the repository root, **before** `poetry install`, because Poetry
-installs SMP from that wheel:
+The full `commonroad-docker-submission` repository and the slim Artemis template
+share the same code, README and tutorials. The full repository includes the 100 public
+scenarios (`planner/assets/scenarios/public/`), bundled SMP wheel
+(`vendor/commonroad_search-2025.1-py3-none-any.whl`) and framework tests (`tests/`).
+The slim template omits these downloadable assets.
+
+From either checkout, run the following before `poetry install`. It reuses assets
+already present and fetches missing data once (about 8 MB). Poetry needs the wheel
+before installation:
 
 ```sh
 python -m planner.fetch_data
@@ -28,7 +32,6 @@ again by itself.
 | Command | Effect |
 | --- | --- |
 | `python -m planner.fetch_data` | Fetch the public scenarios and the SMP wheel if they are missing |
-| `python -m planner.fetch_data --tests` | Also fetch the tests into `tests/`, needed only for `pytest` and `make test` |
 | `python -m planner.fetch_data --force` | Download and unpack again, for example after deleting or editing a scenario |
 | `python -m planner.fetch_data --archive FILE` | Unpack an archive downloaded in a browser, without network access |
 
@@ -36,8 +39,8 @@ If the automatic download does not work (for example behind a restrictive networ
 the error message prints a download link for the archive; download it in a browser and
 pass it with `--archive`.
 
-Git ignores the fetched files, so they never end up in a commit. Do not change them:
-the competition evaluates the original public scenarios.
+In the slim template, Git ignores downloaded assets. The full repository retains its
+tracked copies. Do not change the public scenarios: grading uses the canonical tasks.
 
 ## Install
 
@@ -156,85 +159,80 @@ batch with progress and result reports, use [tutorial 05](tutorials/05_batch_pro
 
 ## Submit on Artemis
 
-This repository is your Artemis exercise. **Every push is graded**: commit your changes
-and push them.
+Run the steps below from your personal Artemis checkout. Artemis evaluates your
+saved results; it does not run your planner or install your dependencies.
+
+### 1. Run and review your planner
+
+Save your planner and required assets in `my_submission/`, then run the public tasks:
 
 ```sh
-git add my_submission
-git commit -m "Improve my planner"
-git push
+python -m planner --public
 ```
 
-On every push, Artemis runs the planner of your `my_submission/` folder, exactly as
-`python -m planner --submission my_submission` does, with the competition settings
-(SM1, seed 1234, at most 200 steps):
+This uses the competition settings and saves completed runs in
+`solutions/<scenario_id>/`. For batch progress and reports, use
+[tutorial 05](tutorials/05_batch_processing.ipynb).
 
-- **Public tests**: the three introductory scenarios
-  (`DEU_AugsburgCRC26P-23_16300_I-1`, `DEU_FlensburgCRC26E-71_11400_I-1` and
-  `DEU_ErlangenCRC26P-12_17300_I-1`). Each test fails if your planner crashes, takes longer
-  than **60 seconds** (including starting Python and loading your planner), or drives a
-  solution that is not valid. The test result on Artemis shows the reason.
-- **Leaderboard**: a fixed set of further public scenarios. The SM1 cost of every valid
-  solution is posted to the competition leaderboard. This test fails only if no scenario
-  is solved.
+Check your results with [tutorial 03](tutorials/03_solution_and_cost_validation.ipynb).
+A failed rerun can leave an older result folder: review these before packaging.
+Keep the exact source, `pyproject.toml` and `poetry.lock` used for your runs.
 
-What Artemis uses from your repository:
+<a id="save-results-for-submission"></a>
 
-- **Only `my_submission/`.** The framework (`planner/`, `simulation/`, `commonroad_rp/`,
-  SMP and all packages of `pyproject.toml`) comes from the grading image, in exactly the
-  version of this repository. Changes to it outside `my_submission/` are ignored on
-  Artemis, so keep your own helper modules and assets inside `my_submission/`.
-- **Extra Python packages**: list them in `my_submission/requirements.txt`; Artemis
-  installs them before running your planner.
-- **Not your result files**: Artemis runs your planner again and simulates the traffic
-  itself; `solutions/` stays ignored by Git.
-
-Test locally before pushing: `python -m planner --scenarios <scenario>` with the same
-scenario gives the same result as Artemis.
-
-## Save results for submission
-
-The CLI saves completed runs under `solutions/<scenario_id>/`. Check results with
-[tutorial 03](tutorials/03_solution_and_cost_validation.ipynb), then package the
-exact generating source and configuration:
+### 2. Package your results and source
 
 ```sh
+python3 package_results.py --solutions solutions --output solutions.zip
 python -m planner.runtime.submission my_submission submission.zip
 ```
 
-For us to evaluate and reproduce your results, please submit these together:
+- **`solutions.zip`** contains the saved results for grading. Each result folder must
+  contain `scenario.xml`, `solution.xml` and `metadata.json` from the same run.
+  Use the exported files without editing them.
+- **`submission.zip`** contains your planner source and assets for reproduction.
 
-- Public result folders, each containing `solution.xml`, `scenario.xml` and
-  `metadata.json` from the same run.
-- `submission.zip` with the exact planner source, configuration and required assets
-  used to generate the results.
-- The repository-root `pyproject.toml` and `poetry.lock` used for those runs,
-  even if unchanged. Submit them separately from the planner bundle.
-- Optionally, a short `environment.md` describing any steps beyond the standard
-  Conda/Poetry setup needed to reproduce your results.
+**Check the size of `solutions.zip`. If it is larger than 30 MB, contact
+[commonroad@lists.lrz.de](mailto:commonroad@lists.lrz.de) before submitting.**
 
-Keep required files inside `my_submission/`; the loader, ZIP and source fingerprint
-include them regardless of extension. Git/editor metadata, caches, environments,
-build folders and generated `outputs/` and `solutions/` are excluded. Copy files
-instead of using symlinks, and write the ZIP outside `my_submission/`.
+### 3. Commit and push
 
-Use the [Conda/Poetry setup](#install). Add extra Python dependencies through Poetry,
-then run `poetry install --with dev,test` before generating results. Submit those
-same dependency files; do not regenerate the lockfile afterward.
+```sh
+git add solutions.zip submission.zip my_submission pyproject.toml poetry.lock
+git commit -m "Submit saved competition results"
+git push
+```
 
-For Docker, also update the Dockerfile's explicit package pins to match your lockfile
-and rebuild. Poetry dependency changes alone do not update the image.
+Keep expanded `solutions/` Git-ignored. If reproduction needs extra setup steps,
+include an `environment.md` and add it to the commit too.
 
-See [tutorial 04](tutorials/04_reuse_and_evaluate_planners.ipynb#Package-and-submit)
-for notebook export, packaging and loading bundled assets relative to your Python file.
+### 4. Check your Artemis feedback
 
-TUM participants submit by pushing this repository to Artemis, see
-[Submit on Artemis](#submit-on-artemis). External participants contact [commonroad@lists.lrz.de](mailto:commonroad@lists.lrz.de)
+You need **at least 30 distinct valid solutions** to pass and enter the leaderboard.
+Artemis checks the saved ego trajectories against their recorded traffic and
+recomputes validity and SM1 costs. A valid solution with a scoring error still
+counts toward 30, but receives no ranking score.
+
+All **100 public benchmarks** count equally. Ranking counts per-scenario first
+places by lowest valid SM1. Your latest submission replaces your previous results;
+falling below 30 valid solutions removes leaderboard eligibility. Check the build
+feedback for missing, invalid or unscored cases.
+
+<details>
+<summary>Custom dependencies and packaging help</summary>
+
+Add dependencies through Poetry and run `poetry install --with dev,test` before
+producing results. Submit the same dependency files used for those runs. For Docker,
+also update its explicit package pins to match the lockfile and rebuild.
+
+Keep required configs, model weights and data inside `my_submission/`, using files
+rather than symlinks. See [tutorial 04](tutorials/04_reuse_and_evaluate_planners.ipynb#Package-and-submit)
+for notebook export and packaging examples.
+
+</details>
+
+External participants can contact [commonroad@lists.lrz.de](mailto:commonroad@lists.lrz.de)
 for submission access.
-
-Urban ranking counts per-scenario first places by lowest valid SM1, with equal
-weight for all 100 public tasks. All evaluation scenarios are available in the
-[benchmark catalogue](tutorials/public_benchmarks.md).
 
 ## Docker and VS Code
 
@@ -254,7 +252,7 @@ docker run --rm --platform linux/amd64 --cpus=1 --memory=4g --memory-swap=4g \
 The image build uses the course data in your checkout, or downloads it if
 [it is missing](#course-data); the build therefore needs network access the first time.
 The source mount runs your current saved planner. For another source bundle, change
-the mount's source path. `--target development` includes notebooks/tests.
+the mount's source path. `--target development` includes notebook tools.
 VS Code's **Dev Containers: Reopen in Container** uses development.
 Adapt Windows mount paths to your shell.
 
@@ -262,12 +260,10 @@ Adapt Windows mount paths to your shell.
 | --- | --- |
 | `make build` / `make run` | Build and run saved `my_submission/` on the Augsburg starter |
 | `make run ARGS=--public` | Run all public tasks |
-| `make build-dev` / `make test` | Build the development image / run tests |
+| `make build-dev` | Build the development image with notebook tools |
 
 Override `IMAGE`, `TAG` or `PLATFORM` as needed. Generated results stay outside
-image builds. The tests are not part of the repository; fetch them with
-`python -m planner.fetch_data --tests` before `make build-dev` / `make test` or the native
-tests: `python -m pytest tests -q --disable-warnings`.
+image builds.
 
 ## License
 
